@@ -1,8 +1,11 @@
+# Dependencies
 node_modules/
-build/
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Build artifacts (common for Vite/Tailwind projects)
 dist/
-coverage/
-.DS_Store
-*.log
-.env*
-!.env.example
+build/

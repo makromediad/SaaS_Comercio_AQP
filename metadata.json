@@ -1,6 +1,0 @@
-{
-  "name": "Mitra POS Arequipa - SaaS Multi-tienda & Catálogo WhatsApp",
-  "description": "Sistema SaaS multi-tienda para pequeños comerciantes de Arequipa: inventario, punto de venta (POS), reportes diarios/semanales/mensuales y catálogo virtual para pedidos contraentrega por WhatsApp.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

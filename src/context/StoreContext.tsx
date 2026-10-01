@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Tenant, Product, Sale, WhatsAppOrder, CartItem, OrderStatus, PaymentMethod } from '../types';
 import { INITIAL_TENANTS, INITIAL_PRODUCTS, INITIAL_SALES, INITIAL_ORDERS } from '../data/initialData';
+import { uid } from '../lib/utils';
 
 interface StoreContextType {
   tenants: Tenant[];
@@ -191,6 +192,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (typeof window === 'undefined') return;
     try {
       const url = new URL(window.location.href);
+      const urlSlug = url.searchParams.get('tienda') || url.searchParams.get('catalogo') || url.searchParams.get('store');
+      // No reescribir el deep-link mientras el tenant de la URL no esté cargado
+      // (evita que ?tienda=boutique-sillar termine apuntando al tenant hard-codeado).
+      if (urlSlug && urlSlug !== currentTenant.slug) {
+        const matched = tenants.find((t) => t.slug === urlSlug || t.id === urlSlug);
+        if (!matched) return;
+      }
       if (viewMode === 'catalog') {
         url.searchParams.set('tienda', currentTenant.slug);
       } else {
@@ -202,7 +210,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch {
       // fallback
     }
-  }, [viewMode, currentTenant.slug]);
+  }, [viewMode, currentTenant.slug, tenants]);
 
   // Listen for browser navigation changes or query parameter updates
   useEffect(() => {
@@ -262,7 +270,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const createTenant = (tenantData: Omit<Tenant, 'id' | 'createdAt'>) => {
-    const newId = `tenant-${Date.now()}`;
+    const newId = uid();
     const newTenant: Tenant = {
       ...tenantData,
       id: newId,
@@ -282,7 +290,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const addProduct = (productData: Omit<Product, 'id' | 'tenantId'>) => {
     const newProduct: Product = {
       ...productData,
-      id: `prod-${Date.now()}`,
+      id: uid(),
       tenantId: currentTenant.id
     };
     setAllProducts((prev) => [newProduct, ...prev]);
@@ -362,7 +370,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const receiptNumber = `B001-${padded}`;
 
     const newSale: Sale = {
-      id: `sale-${Date.now()}`,
+      id: uid(),
       tenantId: currentTenant.id,
       receiptNumber,
       items: saleItems,
@@ -406,10 +414,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const createWhatsAppOrder = (
     orderData: Omit<WhatsAppOrder, 'id' | 'tenantId' | 'orderNumber' | 'createdAt' | 'status'>
   ): WhatsAppOrder => {
-    const orderNumber = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+    // Número secuencial por tenant (sin azar): ORD-#### creciente
+    const lastNum = allOrders
+      .filter((o) => o.tenantId === currentTenant.id)
+      .reduce((mx, o) => Math.max(mx, parseInt(o.orderNumber.replace(/\D/g, ''), 10) || 0), 1000);
+    const orderNumber = `ORD-${lastNum + 1}`;
     const newOrder: WhatsAppOrder = {
       ...orderData,
-      id: `ord-${Date.now()}`,
+      id: uid(),
       tenantId: currentTenant.id,
       orderNumber,
       status: 'pendiente',
@@ -422,58 +434,53 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Order Status Progression
   const updateOrderStatus = (orderId: string, status: OrderStatus) => {
+    const order = allOrders.find((o) => o.id === orderId);
+    if (!order) return;
+
+    // Transición a 'entregado': registrar venta (fuera del updater de estado)
+    if (status === 'entregado' && order.status !== 'entregado') {
+      const saleItems = order.items.map((item) => {
+        const prod = allProducts.find((p) => p.id === item.productId);
+        return {
+          product: prod || {
+                    id: item.productId,
+                    name: item.productName,
+                    salePrice: item.unitPrice,
+                    costPrice: item.unitPrice * 0.7, // fallback
+                    tenantId: currentTenant.id,
+                    sku: 'ORD',
+                    category: 'General',
+                    description: '',
+                    stock: 0,
+                    minStockAlert: 1,
+                    unit: 'unid' as const,
+                    imageUrl: '',
+                    isActive: true,
+                    featuredInCatalog: true
+                  },
+          quantity: item.quantity
+        };
+      });
+
+      recordSale({
+        items: saleItems,
+        paymentMethod: order.paymentMethod,
+        discount: 0,
+        amountPaid: order.total,
+        customerName: `${order.customerName} (${order.district})`,
+        source: 'catalogo_whatsapp',
+        notes: `Pedido WhatsApp ${order.orderNumber} - Ref: ${order.reference}`
+      });
+    }
+
     setAllOrders((prev) =>
-      prev.map((order) => {
-        if (order.id === orderId) {
-          const updated: WhatsAppOrder = {
-            ...order,
-            status,
-            completedAt: status === 'entregado' ? new Date().toISOString() : order.completedAt
-          };
-
-          // If transitioning to 'entregado', optionally register into sales if not already converted
-          if (status === 'entregado' && order.status !== 'entregado') {
-            // Find products
-            const saleItems = order.items.map((item) => {
-              const prod = allProducts.find((p) => p.id === item.productId);
-              return {
-                product: prod || {
-                  id: item.productId,
-                  name: item.productName,
-                  salePrice: item.unitPrice,
-                  costPrice: item.unitPrice * 0.7, // fallback
-                  tenantId: currentTenant.id,
-                  sku: 'ORD',
-                  category: 'General',
-                  description: '',
-                  stock: 0,
-                  minStockAlert: 1,
-                  unit: 'unid' as const,
-                  imageUrl: '',
-                  isActive: true,
-                  featuredInCatalog: true
-                },
-                quantity: item.quantity
-              };
-            });
-
-            recordSale({
-              items: saleItems,
-              paymentMethod: order.paymentMethod,
-              discount: 0,
-              amountPaid: order.total,
-              customerName: `${order.customerName} (${order.district})`,
-              source: 'catalogo_whatsapp',
-              notes: `Pedido WhatsApp ${order.orderNumber} - Ref: ${order.reference}`
-            });
-          }
-
-          return updated;
-        }
-        return order;
-      })
+      prev.map((o) =>
+        o.id === orderId
+          ? { ...o, status, completedAt: status === 'entregado' ? new Date().toISOString() : o.completedAt }
+          : o
+      )
     );
-    showNotification(`Pedido ${orderId} actualizado a: ${status.replace('_', ' ')}`, 'info');
+    showNotification(`Pedido ${order.orderNumber} actualizado a: ${status.replace('_', ' ')}`, 'info');
   };
 
   // Cart operations
