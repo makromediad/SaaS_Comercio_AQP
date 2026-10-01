@@ -1,21 +1,29 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import {fileURLToPath, URL} from 'node:url';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+// Nombre del repositorio en GitHub Pages (makromediad/SaaS_Comercio_AQP).
+// Si se despliega en un dominio propio, cambiar a '/'.
+const REPO = 'SaaS_Comercio_AQP';
+
+export default defineConfig(({command}) => {
+  // En dev se sirve desde '/'; en producción (GitHub Pages project site) desde /REPO/.
+  const base = command === 'serve' ? '/' : `/${REPO}/`;
   return {
+    base,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': fileURLToPath(new URL('.', import.meta.url)),
       },
     },
+    build: {
+      outDir: 'dist',
+      assetsInlineLimit: 0,
+    },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
-      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
   };

@@ -102,7 +102,7 @@ serve(async (req) => {
 
     if (insertErr) return json({ error: insertErr.message }, 500);
 
-    return json({ ok: true, order: { id: order.id, orderNumber, total } });
+    return json({ ok: true, order: { id: order.id, orderNumber, total } }, 200);
   } catch (err) {
     return json({ error: String(err) }, 500);
   }

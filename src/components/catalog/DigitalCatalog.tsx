@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../../context/store';
 import { db, isSupabaseEnabled } from '../../lib/supabase';
+import { resolveImageUrl } from '../../lib/utils';
 import { Product, ArequipaDistrict, PaymentMethod } from '../../types';
 import { AREQUIPA_DISTRICTS } from '../../data/initialData';
 import { 

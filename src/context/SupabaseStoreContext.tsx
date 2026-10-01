@@ -187,7 +187,7 @@ export const SupabaseStoreProvider: React.FC<{ children: React.ReactNode }> = ({
         db.listOrders(tenants.map((t) => t.id)).then(setAllOrders).catch(() => {});
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => { if (supabase) supabase.removeChannel(channel); };
   }, [authUser?.id, tenants.map((t) => t.id).join(','), viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentTenant = useMemo<Tenant>(
