@@ -12,7 +12,8 @@ import {
   Receipt,
   Tag,
   Coins,
-  ShieldCheck
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 
 export const PointOfSale: React.FC = () => {
@@ -25,6 +26,7 @@ export const PointOfSale: React.FC = () => {
   // Ticket Cart State
   const [ticketItems, setTicketItems] = useState<{ product: Product; quantity: number }[]>([]);
   const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [customerDni, setCustomerDni] = useState('');
   const [discount, setDiscount] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('efectivo_contraentrega');
@@ -136,10 +138,14 @@ export const PointOfSale: React.FC = () => {
       amountPaid: paymentMethod === 'efectivo_contraentrega' ? tenderedAmount : total,
       customerName: customerName || 'Cliente Mostrador',
       customerDni: customerDni || undefined,
+      customerPhone: customerPhone || undefined,
       source: 'pos'
     });
 
     clearTicket();
+    setCustomerName('');
+    setCustomerPhone('');
+    setCustomerDni('');
   };
 
   return (
@@ -380,6 +386,33 @@ export const PointOfSale: React.FC = () => {
         {/* Totals & Payment Checkout Panel */}
         <form onSubmit={handleCheckout} className="p-5 border-t border-slate-200 bg-slate-50/80 space-y-3">
           
+          {/* Customer CRM data inputs (Optional) */}
+          <div className="p-2.5 bg-white rounded-xl border border-slate-200 space-y-1.5 shadow-2xs">
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+              <span className="flex items-center gap-1">
+                <Users className="w-3.5 h-3.5 text-amber-600" />
+                <span>Cliente (CRM & Boleta)</span>
+              </span>
+              <span className="text-[10px] text-slate-400 font-normal">Opcional</span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <input
+                type="text"
+                placeholder="Nombre del cliente..."
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:border-blue-950 focus:outline-none"
+              />
+              <input
+                type="tel"
+                placeholder="WhatsApp (954...)"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                className="w-full px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:border-blue-950 focus:outline-none font-mono"
+              />
+            </div>
+          </div>
+
           {/* Subtotal & Discount row */}
           <div className="space-y-1.5 text-xs text-slate-600">
             <div className="flex justify-between">

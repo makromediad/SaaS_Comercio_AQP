@@ -23,7 +23,10 @@ import {
   Share2,
   QrCode,
   Copy,
-  Check
+  Check,
+  Users,
+  Bot,
+  HeartHandshake
 } from 'lucide-react';
 
 export const ExecutiveDashboard: React.FC = () => {
@@ -32,6 +35,8 @@ export const ExecutiveDashboard: React.FC = () => {
     products, 
     sales, 
     orders, 
+    customers,
+    whatsappAiConfig,
     setAdminTab, 
     setViewMode, 
     setLastSale,
@@ -334,56 +339,82 @@ export const ExecutiveDashboard: React.FC = () => {
       </div>
 
       {/* 3. Operational Quick Actions Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <button
           onClick={() => setAdminTab('pos')}
-          className="p-3.5 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-3 cursor-pointer group"
+          className="p-3 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
             <ShoppingBag className="w-4 h-4" />
           </div>
-          <div>
-            <p className="text-xs font-bold text-blue-950">Cobrar Venta</p>
-            <p className="text-[10px] text-slate-400 font-medium">Terminal POS rápido</p>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-blue-950 truncate">Caja POS</p>
+            <p className="text-[10px] text-slate-400 font-medium truncate">Cobro rápido</p>
           </div>
         </button>
 
         <button
           onClick={() => setAdminTab('orders')}
-          className="p-3.5 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-3 cursor-pointer group"
+          className="p-3 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
             <Truck className="w-4 h-4" />
           </div>
-          <div>
-            <p className="text-xs font-bold text-blue-950">Despachos</p>
-            <p className="text-[10px] text-slate-400 font-medium">Entregas en Arequipa</p>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-blue-950 truncate">Despachos</p>
+            <p className="text-[10px] text-slate-400 font-medium truncate">Contraentrega</p>
           </div>
         </button>
 
         <button
           onClick={() => setAdminTab('inventory')}
-          className="p-3.5 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-3 cursor-pointer group"
+          className="p-3 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
             <Package className="w-4 h-4" />
           </div>
-          <div>
-            <p className="text-xs font-bold text-blue-950">Ingresar Stock</p>
-            <p className="text-[10px] text-slate-400 font-medium">Actualizar productos</p>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-blue-950 truncate">Inventario</p>
+            <p className="text-[10px] text-slate-400 font-medium truncate">Control stock</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setAdminTab('crm')}
+          className="p-3 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-2.5 cursor-pointer group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
+            <Users className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-blue-950 truncate">CRM Clientes</p>
+            <p className="text-[10px] text-slate-400 font-medium truncate">{customers.length} en cartera</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setAdminTab('ai_automation')}
+          className="p-3 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-2.5 cursor-pointer group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center shrink-0 border border-emerald-500/40 group-hover:scale-105 transition-transform">
+            <Bot className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-emerald-950 truncate">IA WhatsApp</p>
+            <p className="text-[10px] text-emerald-700 font-medium truncate">Bot activo</p>
           </div>
         </button>
 
         <button
           onClick={() => setAdminTab('reports')}
-          className="p-3.5 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-3 cursor-pointer group"
+          className="p-3 bg-white rounded-xl border border-slate-200 hover:border-amber-500/60 hover:shadow-xs transition-all text-left flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-lg bg-blue-950 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40 group-hover:scale-105 transition-transform">
             <TrendingUp className="w-4 h-4" />
           </div>
-          <div>
-            <p className="text-xs font-bold text-blue-950">Reportes</p>
-            <p className="text-[10px] text-slate-400 font-medium">Balances diarios/mes</p>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-blue-950 truncate">Reportes</p>
+            <p className="text-[10px] text-slate-400 font-medium truncate">Balances/Mes</p>
           </div>
         </button>
       </div>
@@ -617,6 +648,41 @@ export const ExecutiveDashboard: React.FC = () => {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+
+          {/* CRM & WhatsApp AI Summary Widget */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-blue-950 uppercase tracking-wider flex items-center gap-1.5">
+                <HeartHandshake className="w-3.5 h-3.5 text-amber-600" />
+                <span>CRM & Asistente IA</span>
+              </span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Bot activo" />
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <div 
+                onClick={() => setAdminTab('crm')}
+                className="p-2.5 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 cursor-pointer flex items-center justify-between transition-colors"
+              >
+                <div>
+                  <p className="font-bold text-blue-950">Cartera de Clientes</p>
+                  <p className="text-[10px] text-slate-500">{customers.length} caseros en Arequipa</p>
+                </div>
+                <Users className="w-4 h-4 text-amber-600" />
+              </div>
+
+              <div 
+                onClick={() => setAdminTab('ai_automation')}
+                className="p-2.5 bg-emerald-50/70 hover:bg-emerald-100/70 rounded-xl border border-emerald-200/80 cursor-pointer flex items-center justify-between transition-colors"
+              >
+                <div>
+                  <p className="font-bold text-emerald-950">Bot IA: {whatsappAiConfig.botName}</p>
+                  <p className="text-[10px] text-emerald-700 capitalize">Tono {whatsappAiConfig.personality.replace('_', ' ')}</p>
+                </div>
+                <Bot className="w-4 h-4 text-emerald-700" />
+              </div>
             </div>
           </div>
 

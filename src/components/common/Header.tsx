@@ -15,7 +15,10 @@ import {
   MapPin,
   Crown,
   LayoutDashboard,
-  Share2
+  Share2,
+  Users,
+  Bot,
+  ShieldCheck
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -118,16 +121,27 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
                   ))}
                 </div>
 
-                <div className="border-t border-slate-100 p-2 bg-slate-50/40 rounded-b-xl">
+                <div className="border-t border-slate-100 p-2 bg-slate-50/40 rounded-b-xl space-y-1.5">
+                  <button
+                    onClick={() => {
+                      setTenantDropdownOpen(false);
+                      setViewMode('superadmin');
+                    }}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-black text-white bg-blue-950 hover:bg-blue-900 border border-amber-500/50 rounded-lg transition-colors cursor-pointer shadow-xs"
+                  >
+                    <Crown className="w-3.5 h-3.5 text-amber-400" />
+                    <span>⚡ Consola Superusuario (Empresas)</span>
+                  </button>
+
                   <button
                     onClick={() => {
                       setTenantDropdownOpen(false);
                       onOpenNewTenantModal();
                     }}
-                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-blue-950 bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/50 rounded-lg transition-colors cursor-pointer"
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-950 bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/50 rounded-lg transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5 text-amber-700" />
-                    <span>Registrar Nuevo Comercio</span>
+                    <span>+ Registrar Nuevo Comercio</span>
                   </button>
                 </div>
               </div>
@@ -136,7 +150,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
         </div>
 
         {/* Zone 2: Navigation links */}
-        {viewMode === 'admin' ? (
+        {viewMode === 'superadmin' ? (
+          <div className="hidden md:flex items-center gap-3 text-xs">
+            <span className="px-3.5 py-1.5 bg-gradient-to-r from-blue-950 to-blue-900 border border-amber-500/50 rounded-xl text-white font-extrabold flex items-center gap-2 shadow-xs">
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <span>Consola Master Superusuario (SaaS MitraPOS)</span>
+            </span>
+            <span className="text-slate-500 font-semibold">{tenants.length} empresas registradas</span>
+          </div>
+        ) : viewMode === 'admin' ? (
           <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
             <button
               onClick={() => setAdminTab('dashboard')}
@@ -202,6 +224,30 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
             </button>
 
             <button
+              onClick={() => setAdminTab('crm')}
+              className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                adminTab === 'crm'
+                  ? 'bg-blue-950 text-white font-bold shadow-xs border border-amber-500/30'
+                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
+              }`}
+            >
+              <Users className={`w-4 h-4 ${adminTab === 'crm' ? 'text-amber-400' : 'text-slate-500'}`} />
+              <span>CRM Clientes</span>
+            </button>
+
+            <button
+              onClick={() => setAdminTab('ai_automation')}
+              className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                adminTab === 'ai_automation'
+                  ? 'bg-blue-950 text-white font-bold shadow-xs border border-amber-500/30'
+                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
+              }`}
+            >
+              <Bot className={`w-4 h-4 ${adminTab === 'ai_automation' ? 'text-amber-400' : 'text-slate-500'}`} />
+              <span>IA WhatsApp</span>
+            </button>
+
+            <button
               onClick={() => setAdminTab('settings')}
               className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 adminTab === 'settings'
@@ -225,6 +271,30 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
 
         {/* Zone 3: Primary action buttons */}
         <div className="flex items-center gap-2">
+          {/* Superadmin Console Button */}
+          {viewMode !== 'superadmin' ? (
+            <button
+              onClick={() => setViewMode('superadmin')}
+              className="px-3 py-2 text-xs font-black text-blue-950 bg-gradient-to-r from-amber-400/25 to-amber-300/35 hover:from-amber-400/40 hover:to-amber-300/50 border border-amber-500/50 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs hover:border-amber-500 active:scale-95"
+              title="Abrir Dashboard Superusuario para administrar empresas y planes"
+            >
+              <Crown className="w-3.5 h-3.5 text-amber-600" />
+              <span className="hidden sm:inline">Superusuario</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setViewMode('admin');
+                setAdminTab('dashboard');
+              }}
+              className="px-3 py-2 text-xs font-black text-blue-950 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs hover:border-amber-400 active:scale-95"
+              title="Regresar al panel de la tienda activa"
+            >
+              <Store className="w-3.5 h-3.5 text-amber-600" />
+              <span>Volver a Tienda</span>
+            </button>
+          )}
+
           {/* Share Catalog Link Button */}
           <button
             onClick={() => setIsShareModalOpen(true)}
@@ -235,7 +305,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
             <span className="hidden sm:inline">Link Clientes</span>
           </button>
 
-          {viewMode === 'admin' ? (
+          {viewMode === 'catalog' ? (
+            <button
+              onClick={() => setViewMode('admin')}
+              className="px-3.5 py-2 text-xs font-bold text-white bg-blue-950 hover:bg-blue-900 border border-amber-500/40 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.99]"
+            >
+              <Store className="w-3.5 h-3.5 text-amber-400" />
+              <span>Panel Comerciante</span>
+            </button>
+          ) : (
             <button
               onClick={() => setViewMode('catalog')}
               className="px-3.5 py-2 text-xs font-bold text-blue-950 bg-gradient-to-r from-amber-400/20 to-amber-300/30 hover:from-amber-400/30 hover:to-amber-300/40 border border-amber-400/70 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.99]"
@@ -243,14 +321,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
             >
               <ExternalLink className="w-3.5 h-3.5 text-amber-700" />
               <span>Ver Catálogo</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => setViewMode('admin')}
-              className="px-3.5 py-2 text-xs font-bold text-white bg-blue-950 hover:bg-blue-900 border border-amber-500/40 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.99]"
-            >
-              <Store className="w-3.5 h-3.5 text-amber-400" />
-              <span>Panel Comerciante</span>
             </button>
           )}
         </div>
@@ -304,12 +374,34 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
             )}
           </button>
           <button
+            onClick={() => setAdminTab('crm')}
+            className={`px-2.5 py-1.5 rounded-md font-semibold whitespace-nowrap ${
+              adminTab === 'crm' ? 'bg-blue-950 text-white' : 'text-slate-600'
+            }`}
+          >
+            CRM
+          </button>
+          <button
+            onClick={() => setAdminTab('ai_automation')}
+            className={`px-2.5 py-1.5 rounded-md font-semibold whitespace-nowrap ${
+              adminTab === 'ai_automation' ? 'bg-blue-950 text-white' : 'text-slate-600'
+            }`}
+          >
+            IA Bot
+          </button>
+          <button
             onClick={() => setAdminTab('settings')}
             className={`px-2.5 py-1.5 rounded-md font-semibold whitespace-nowrap ${
               adminTab === 'settings' ? 'bg-blue-950 text-white' : 'text-slate-600'
             }`}
           >
             Ajustes
+          </button>
+          <button
+            onClick={() => setViewMode('superadmin')}
+            className="px-2.5 py-1.5 rounded-md font-extrabold whitespace-nowrap bg-amber-400/20 text-amber-800 border border-amber-400/50"
+          >
+            👑 Superadmin
           </button>
         </div>
       )}

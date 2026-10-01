@@ -11,8 +11,11 @@ import { PointOfSale } from './components/pos/PointOfSale';
 import { InventoryManager } from './components/inventory/InventoryManager';
 import { ReportsView } from './components/reports/ReportsView';
 import { WhatsAppOrders } from './components/orders/WhatsAppOrders';
+import { CustomerCRM } from './components/crm/CustomerCRM';
+import { WhatsAppAIHub } from './components/automation/WhatsAppAIHub';
 import { DigitalCatalog } from './components/catalog/DigitalCatalog';
 import { TenantSettings } from './components/tenant/TenantSettings';
+import { SuperadminDashboard } from './components/superadmin/SuperadminDashboard';
 import { ReceiptModal } from './components/pos/ReceiptModal';
 import { NewTenantModal } from './components/tenant/NewTenantModal';
 import { ShareCatalogModal } from './components/catalog/ShareCatalogModal';
@@ -40,6 +43,8 @@ const MainApp: React.FC = () => {
       <main className="flex-1">
         {viewMode === 'catalog' ? (
           <DigitalCatalog />
+        ) : viewMode === 'superadmin' ? (
+          <SuperadminDashboard />
         ) : (
           <div>
             {adminTab === 'dashboard' && <ExecutiveDashboard />}
@@ -47,6 +52,8 @@ const MainApp: React.FC = () => {
             {adminTab === 'inventory' && <InventoryManager />}
             {adminTab === 'reports' && <ReportsView />}
             {adminTab === 'orders' && <WhatsAppOrders />}
+            {adminTab === 'crm' && <CustomerCRM />}
+            {adminTab === 'ai_automation' && <WhatsAppAIHub />}
             {adminTab === 'settings' && <TenantSettings />}
           </div>
         )}

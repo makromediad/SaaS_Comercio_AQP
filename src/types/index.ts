@@ -16,6 +16,11 @@ export type ArequipaDistrict =
 
 export type PaymentMethod = 'efectivo_contraentrega' | 'yape_contraentrega' | 'plin_contraentrega';
 
+export type SaaSPlan = 'basico' | 'emprendedor' | 'pro_ia';
+export type BusinessCategory = 'bodega' | 'minimarket' | 'licoreria' | 'restaurante' | 'panaderia' | 'botica' | 'artesania' | 'otro';
+export type TenantStatus = 'activo' | 'prueba' | 'suspendido';
+export type ViewMode = 'admin' | 'catalog' | 'superadmin';
+
 export interface Tenant {
   id: string;
   name: string;
@@ -27,6 +32,13 @@ export interface Tenant {
   yapePhone?: string;
   plinPhone?: string;
   ownerName: string;
+  ownerEmail?: string;
+  ruc?: string;
+  plan?: SaaSPlan;
+  businessCategory?: BusinessCategory;
+  status?: TenantStatus;
+  monthlyFee?: number; // in S/.
+  notes?: string;
   bannerImage?: string;
   currency: string; // "S/."
   defaultDeliveryFee: number; // in S/.
@@ -116,5 +128,55 @@ export interface WhatsAppOrder {
   createdAt: string;
   completedAt?: string;
 }
+
+export type CustomerTag = 'vip' | 'frecuente' | 'nuevo' | 'ocasional' | 'inactivo';
+
+export interface Customer {
+  id: string;
+  tenantId: string;
+  name: string;
+  phone: string;
+  dni?: string;
+  district: ArequipaDistrict;
+  address: string;
+  reference?: string;
+  tag: CustomerTag;
+  notes?: string;
+  totalOrders: number;
+  totalSpent: number;
+  averageTicket: number;
+  lastOrderDate: string;
+  createdAt: string;
+  favoriteProducts?: string[];
+  aiInsights?: {
+    summary: string;
+    suggestedMessage: string;
+    persona: string;
+    lastAnalyzedAt: string;
+  };
+}
+
+export type BotPersonality = 'amable_arequipeno' | 'formal_comercial' | 'vendedor_proactivo';
+
+export interface WhatsAppAiConfig {
+  enabled: boolean;
+  botName: string;
+  personality: BotPersonality;
+  customPrompt?: string;
+  welcomeMessage: string;
+  autoReplyPriceStock: boolean;
+  autoSendCatalogLink: boolean;
+  autoSendPaymentInfo: boolean;
+}
+
+export interface AiChatMessage {
+  id: string;
+  sender: 'customer' | 'bot' | 'merchant';
+  text: string;
+  timestamp: string;
+  status?: 'sent' | 'delivered' | 'read';
+}
+
+export type AdminTab = 'dashboard' | 'pos' | 'inventory' | 'reports' | 'orders' | 'crm' | 'ai_automation' | 'settings';
 
 export type ReportPeriod = 'hoy' | 'semana' | 'mes' | 'historico';

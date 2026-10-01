@@ -1,4 +1,4 @@
-import { Tenant, Product, Sale, WhatsAppOrder } from '../types';
+import { Tenant, Product, Sale, WhatsAppOrder, Customer, WhatsAppAiConfig } from '../types';
 
 export const INITIAL_TENANTS: Tenant[] = [
   {
@@ -12,6 +12,12 @@ export const INITIAL_TENANTS: Tenant[] = [
     yapePhone: '954 123 456',
     plinPhone: '954 123 456',
     ownerName: 'Doña Rosa Valdivia',
+    ownerEmail: 'rosa.valdivia@characata.pe',
+    ruc: '20608945123',
+    plan: 'pro_ia',
+    businessCategory: 'bodega',
+    status: 'activo',
+    monthlyFee: 149,
     bannerImage: '/src/assets/images/store_bodega_showcase_1790861644926.jpg',
     currency: 'S/.',
     defaultDeliveryFee: 5.0,
@@ -31,6 +37,12 @@ export const INITIAL_TENANTS: Tenant[] = [
     yapePhone: '959 789 012',
     plinPhone: '959 789 012',
     ownerName: 'Carlos Mendoza',
+    ownerEmail: 'carlos.mendoza@sancamiloexpress.pe',
+    ruc: '10458921478',
+    plan: 'emprendedor',
+    businessCategory: 'minimarket',
+    status: 'activo',
+    monthlyFee: 89,
     bannerImage: '/src/assets/images/hero_arequipa_market_1790861630483.jpg',
     currency: 'S/.',
     defaultDeliveryFee: 6.0,
@@ -50,6 +62,12 @@ export const INITIAL_TENANTS: Tenant[] = [
     yapePhone: '958 654 321',
     plinPhone: '958 654 321',
     ownerName: 'Mariana Bedregal',
+    ownerEmail: 'mariana@sillararequipa.com',
+    ruc: '20498125634',
+    plan: 'pro_ia',
+    businessCategory: 'artesania',
+    status: 'activo',
+    monthlyFee: 149,
     bannerImage: '/src/assets/images/artisan_product_chocolates_1790861657657.jpg',
     currency: 'S/.',
     defaultDeliveryFee: 5.0,
@@ -57,6 +75,31 @@ export const INITIAL_TENANTS: Tenant[] = [
     deliveryCoverage: ['Cercado de Arequipa', 'Yanahuara', 'Cayma', 'Miraflores', 'Umacollo'],
     active: true,
     createdAt: '2026-02-20T10:00:00.000Z'
+  },
+  {
+    id: 'tenant-panaderia-misti',
+    name: 'Panadería & Café El Misti',
+    slug: 'panaderia-el-misti',
+    tagline: 'Pan de tres puntas, empanadas y café de especialidad de la sierra',
+    district: 'Cayma',
+    address: 'Av. Bolognesi 312, Cayma, Arequipa',
+    whatsappNumber: '51957345678',
+    yapePhone: '957 345 678',
+    plinPhone: '957 345 678',
+    ownerName: 'Guillermo Zeballos',
+    ownerEmail: 'contacto@panaderiaelmisti.pe',
+    ruc: '20129845612',
+    plan: 'basico',
+    businessCategory: 'panaderia',
+    status: 'prueba',
+    monthlyFee: 49,
+    bannerImage: '/src/assets/images/store_bodega_showcase_1790861644926.jpg',
+    currency: 'S/.',
+    defaultDeliveryFee: 4.5,
+    freeDeliveryThreshold: 40.0,
+    deliveryCoverage: ['Cayma', 'Yanahuara', 'Cercado de Arequipa'],
+    active: true,
+    createdAt: '2026-03-01T11:00:00.000Z'
   }
 ];
 
@@ -709,3 +752,142 @@ export const AREQUIPA_DISTRICTS: string[] = [
   'Jacobo Hunter',
   'Umacollo'
 ];
+
+export const INITIAL_CUSTOMERS: Customer[] = [
+  {
+    id: 'cust-001',
+    tenantId: 'tenant-characato',
+    name: 'Carlos Mendoza Paredes',
+    phone: '954882190',
+    dni: '29684120',
+    district: 'Cayma',
+    address: 'Av. Ejército 720, Dpto 402',
+    reference: 'Frente al Mall Plaza Cayma',
+    tag: 'vip',
+    notes: 'Cliente fiel de fin de semana. Suele pedir Queso Paria y Bombones La Ibérica. Prefiere recibir antes de la 1:00 PM y pagar con Yape.',
+    totalOrders: 6,
+    totalSpent: 384.50,
+    averageTicket: 64.08,
+    lastOrderDate: '2026-10-01T10:15:00.000Z',
+    createdAt: '2026-08-10T09:00:00.000Z',
+    favoriteProducts: ['Queso Paria Arequipeño Majes (500g)', 'Bombones de Chocolate La Ibérica 150g'],
+    aiInsights: {
+      persona: 'Consumidor Gourmet Arequipeño (Perfil Alto)',
+      summary: 'Cliente con 100% de tasa de cumplimiento en pago contraentrega. Alta afinidad por productos tradicionales de repostería y lácteos de Majes.',
+      suggestedMessage: '¡Hola Carlos! 🧀 Llegó un lote fresco de Queso Paria Majes recién traído y Bombones La Ibérica. ¿Te gustaría que te apartemos para tu entrega en Cayma este fin de semana?',
+      lastAnalyzedAt: '2026-10-01T12:00:00.000Z'
+    }
+  },
+  {
+    id: 'cust-002',
+    tenantId: 'tenant-characato',
+    name: 'Gabriela Nuñez Zeballos',
+    phone: '958112340',
+    dni: '45812904',
+    district: 'Yanahuara',
+    address: 'Calle Lima 210',
+    reference: 'A media cuadra de la Plaza de Yanahuara',
+    tag: 'frecuente',
+    notes: 'Vecina de Yanahuara, suele pedir Queso Helado y Macerado de Damasco. Paga en efectivo con billete de 100 o Yape.',
+    totalOrders: 4,
+    totalSpent: 198.00,
+    averageTicket: 49.50,
+    lastOrderDate: '2026-10-01T11:45:00.000Z',
+    createdAt: '2026-08-25T14:30:00.000Z',
+    favoriteProducts: ['Queso Helado Artesanal Characato (1 Lt)', 'Macerado de Damasco Tradición Characata 500ml'],
+    aiInsights: {
+      persona: 'Vecina Tradicional & Amante de Postres',
+      summary: 'Compra frecuentemente postres para reuniones familiares los jueves y domingos.',
+      suggestedMessage: '¡Hola Gabriela! 🍨 Doña Rosa acaba de preparar una tanda fresca de Queso Helado con canela majesina. ¿Te enviamos un litro a tu casa en Calle Lima?',
+      lastAnalyzedAt: '2026-10-01T12:00:00.000Z'
+    }
+  },
+  {
+    id: 'cust-003',
+    tenantId: 'tenant-characato',
+    name: 'Jorge Luis Barreda',
+    phone: '959334411',
+    dni: '29410055',
+    district: 'Cerro Colorado',
+    address: 'Urb. Las Orquídeas Mz. B Lte. 12',
+    reference: 'Cerca a la Vía Evitamiento',
+    tag: 'ocasional',
+    notes: 'Pide ocasionalmente canastas o pedidos grandes de pan de 3 puntas y Kola Escocesa para desayunos de domingo.',
+    totalOrders: 2,
+    totalSpent: 96.00,
+    averageTicket: 48.00,
+    lastOrderDate: '2026-09-24T08:30:00.000Z',
+    createdAt: '2026-09-05T10:15:00.000Z',
+    favoriteProducts: ['Pan de Tres Puntas Tradicional (Bolsa x6)', 'Kola Escocesa Arequipeña 1.5L']
+  },
+  {
+    id: 'cust-004',
+    tenantId: 'tenant-characato',
+    name: 'María Elena Tejada',
+    phone: '957445566',
+    dni: '41209388',
+    district: 'José Luis Bustamante y Rivero',
+    address: 'Av. Dolores 450, Interior 3',
+    reference: 'Frente al parque temático',
+    tag: 'nuevo',
+    notes: 'Primer pedido realizado por catálogo WhatsApp. Muy contenta con el delivery puntual.',
+    totalOrders: 1,
+    totalSpent: 47.50,
+    averageTicket: 47.50,
+    lastOrderDate: '2026-10-01T09:20:00.000Z',
+    createdAt: '2026-10-01T09:20:00.000Z',
+    favoriteProducts: ['Té Sol de Arequipa (Caja 25 filtrantes)', 'Café Gourmet Valle de Tambo 250g']
+  },
+  {
+    id: 'cust-005',
+    tenantId: 'tenant-characato',
+    name: 'Patricia Chávez Guillén',
+    phone: '954778899',
+    dni: '29871102',
+    district: 'Yanahuara',
+    address: 'Cuesta del Ángel 140',
+    reference: 'Casa de sillar con puerta de madera',
+    tag: 'frecuente',
+    notes: 'Compra presencial y pide delivery en días de lluvia. Paga siempre contraentrega en efectivo exacto.',
+    totalOrders: 5,
+    totalSpent: 265.00,
+    averageTicket: 53.00,
+    lastOrderDate: '2026-09-30T16:20:00.000Z',
+    createdAt: '2026-08-01T11:00:00.000Z',
+    favoriteProducts: ['Miel de Abeja Pura Valle de Yarabamba 500g', 'Queso Paria Arequipeño Majes (500g)']
+  }
+];
+
+export const INITIAL_AI_CONFIG: Record<string, WhatsAppAiConfig> = {
+  'tenant-characato': {
+    enabled: true,
+    botName: 'Characatito Bot',
+    personality: 'amable_arequipeno',
+    customPrompt: 'Atiende con calidez arequipeña, menciona nuestras tradiciones, recomienda los quesos de Majes y chocolates La Ibérica, y aclara que el pago es contraentrega en efectivo o Yape/Plin al momento de recibir.',
+    welcomeMessage: '¡Hola caserito/a! 🌋 Bienvenido a Bodega La Characata en Yanahuara. ¿En qué te podemos consentir hoy? Pregúntame por precios, stock, o haz tu pedido contraentrega.',
+    autoReplyPriceStock: true,
+    autoSendCatalogLink: true,
+    autoSendPaymentInfo: true
+  },
+  'tenant-sancamilo': {
+    enabled: true,
+    botName: 'Sancamilito Express',
+    personality: 'vendedor_proactivo',
+    customPrompt: 'Atención rápida y eficiente tipo minimarket, promueve los combos de abarrotes y bebidas frías con entrega rápida en J.L. Bustamante y Rivero.',
+    welcomeMessage: '¡Buenas! Bienvenido a Minimarket San Camilo Express. ⚡ Hacemos entregas express en 30-45 min con pago contraentrega. ¿Qué te hace falta?',
+    autoReplyPriceStock: true,
+    autoSendCatalogLink: true,
+    autoSendPaymentInfo: true
+  },
+  'tenant-sillar': {
+    enabled: true,
+    botName: 'Sillar Bot Gourmet',
+    personality: 'formal_comercial',
+    customPrompt: 'Atención distinguida para clientes del Cercado y turistas, destacando productos selectos y artesanías finas de Arequipa.',
+    welcomeMessage: 'Estimado cliente, bienvenido a Boutique Tradición & Sillar. Es un placer atenderle. ¿Desea consultar nuestro catálogo de productos exclusivos?',
+    autoReplyPriceStock: true,
+    autoSendCatalogLink: true,
+    autoSendPaymentInfo: true
+  }
+};
+
