@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useStore } from '../../context/StoreContext';
+import { useStore } from '../../context/store';
 import { AREQUIPA_DISTRICTS } from '../../data/initialData';
 import { ArequipaDistrict } from '../../types';
 import { Store, MapPin, Phone, Truck, Save, Smartphone, Crown, Share2, Copy, Check, QrCode, ExternalLink } from 'lucide-react';

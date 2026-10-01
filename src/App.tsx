@@ -4,7 +4,8 @@
  */
 
 import React, { useState } from 'react';
-import { StoreProvider, useStore } from './context/StoreContext';
+import { StoreProvider, useStore, useAuthExtras } from './context/store';
+import { LoginView } from './components/auth/LoginView';
 import { Header } from './components/common/Header';
 import { ExecutiveDashboard } from './components/dashboard/ExecutiveDashboard';
 import { PointOfSale } from './components/pos/PointOfSale';
@@ -84,10 +85,29 @@ const MainApp: React.FC = () => {
   );
 };
 
+const AppShell: React.FC = () => {
+  const { enabled, session, loading } = useAuthExtras();
+  // En modo Supabase, el panel de administración exige sesión.
+  // La vista de catálogo público (?tienda=slug) NUNCA requiere login.
+  if (enabled && !loading && !session) {
+    const isCatalog = typeof window !== 'undefined' &&
+      /(?:[?&])(?:tienda|catalogo|store)=/.test(window.location.search);
+    if (!isCatalog) return <LoginView />;
+  }
+  if (enabled && loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+        <p className="text-slate-500 font-semibold animate-pulse">Cargando tu tienda…</p>
+      </div>
+    );
+  }
+  return <MainApp />;
+};
+
 export default function App() {
   return (
     <StoreProvider>
-      <MainApp />
+      <AppShell />
     </StoreProvider>
   );
 }

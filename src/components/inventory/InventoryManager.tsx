@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useStore } from '../../context/StoreContext';
+import { useStore } from '../../context/store';
+import { resolveImageUrl } from '../../lib/utils';
 import { Product } from '../../types';
 import { 
   Package, 
@@ -374,7 +375,7 @@ export const InventoryManager: React.FC = () => {
                           <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                             {product.imageUrl ? (
                               <img
-                                src={product.imageUrl}
+                                src={resolveImageUrl(product.imageUrl)}
                                 alt={product.name}
                                 referrerPolicy="no-referrer"
                                 className="w-full h-full object-cover"

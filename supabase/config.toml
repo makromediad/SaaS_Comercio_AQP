@@ -1,0 +1,9 @@
+# ============================================================
+# Configuración de Supabase para Mitra POS Arequipa
+# Reemplaza <PROJECT_ID> por el ID de tu proyecto (Dashboard → Settings → API)
+# Docs: https://supabase.com/docs/guides/cli
+# ============================================================
+project_id = "<PROJECT_ID>"
+
+[functions.create-order]
+verify_jwt = false   # los clientes del catálogo son anónimos

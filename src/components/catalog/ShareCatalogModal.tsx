@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useStore } from '../../context/StoreContext';
+import { useStore } from '../../context/store';
 import QRCode from 'qrcode';
 import { 
   X, 

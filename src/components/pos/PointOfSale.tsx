@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useStore } from '../../context/StoreContext';
+import { useStore } from '../../context/store';
+import { resolveImageUrl } from '../../lib/utils';
 import { Product, PaymentMethod } from '../../types';
 import { 
   Search, 
@@ -220,7 +221,7 @@ export const PointOfSale: React.FC = () => {
                       <div className="w-full aspect-4/3 rounded-lg overflow-hidden bg-slate-100 mb-2.5 relative border border-slate-100">
                         {product.imageUrl ? (
                           <img
-                            src={product.imageUrl}
+                            src={resolveImageUrl(product.imageUrl)}
                             alt={product.name}
                             referrerPolicy="no-referrer"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

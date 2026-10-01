@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useStore } from '../../context/StoreContext';
+import { useStore } from '../../context/store';
+import { db, isSupabaseEnabled } from '../../lib/supabase';
 import { Product, ArequipaDistrict, PaymentMethod } from '../../types';
 import { AREQUIPA_DISTRICTS } from '../../data/initialData';
 import { 
@@ -89,7 +90,7 @@ export const DigitalCatalog: React.FC = () => {
   const finalTotal = cartTotal + deliveryFee;
 
   // Handle Checkout via WhatsApp
-  const handleSendOrder = (e: React.FormEvent) => {
+  const handleSendOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
     if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim()) {
@@ -119,21 +120,44 @@ export const DigitalCatalog: React.FC = () => {
       paymentDetail = `Plin contraentrega al recibir el pedido (Plin tienda: ${currentTenant.plinPhone || currentTenant.whatsappNumber})`;
     }
 
-    // Register into merchant state
-    const createdOrder = createWhatsAppOrder({
-      customerName,
-      customerPhone,
-      district: selectedDistrict,
-      address: customerAddress,
-      reference: customerReference,
-      items: itemsSummary,
-      subtotal: cartTotal,
-      deliveryFee,
-      total: finalTotal,
-      paymentMethod,
-      paymentDetail,
-      notes: orderNotes
-    });
+    // Register the order. En modo Supabase se crea en el servidor vía Edge
+    // Function (cliente anónimo, stock revalidado); en modo local va al store.
+    let createdOrder: { orderNumber: string };
+    if (isSupabaseEnabled) {
+      try {
+        const serverOrder = await db.createPublicOrder({
+          tenantId: currentTenant.id,
+          items: itemsSummary.map(({ productId, quantity }) => ({ productId, quantity })),
+          customerName,
+          customerPhone,
+          district: selectedDistrict,
+          address: customerAddress,
+          reference: customerReference,
+          paymentMethod,
+          deliveryFee,
+          notes: orderNotes,
+        });
+        createdOrder = { orderNumber: serverOrder.orderNumber };
+      } catch (err) {
+        showNotification(`No se pudo registrar el pedido en la tienda: ${(err as Error).message}`, 'warning');
+        return;
+      }
+    } else {
+      createdOrder = createWhatsAppOrder({
+        customerName,
+        customerPhone,
+        district: selectedDistrict,
+        address: customerAddress,
+        reference: customerReference,
+        items: itemsSummary,
+        subtotal: cartTotal,
+        deliveryFee,
+        total: finalTotal,
+        paymentMethod,
+        paymentDetail,
+        notes: orderNotes
+      });
+    }
 
     // Format WhatsApp message text
     const itemsFormatted = cart
@@ -185,7 +209,7 @@ export const DigitalCatalog: React.FC = () => {
         {currentTenant.bannerImage && (
           <div className="absolute inset-0 opacity-20">
             <img
-              src={currentTenant.bannerImage}
+              src={resolveImageUrl(currentTenant.bannerImage)}
               alt={currentTenant.name}
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover"
@@ -309,7 +333,7 @@ export const DigitalCatalog: React.FC = () => {
                     <div className="aspect-4/3 w-full bg-slate-100 overflow-hidden relative">
                       {product.imageUrl ? (
                         <img
-                          src={product.imageUrl}
+                          src={resolveImageUrl(product.imageUrl)}
                           alt={product.name}
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

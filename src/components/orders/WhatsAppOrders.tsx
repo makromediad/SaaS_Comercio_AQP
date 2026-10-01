@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useStore } from '../../context/StoreContext';
+import { useStore } from '../../context/store';
 import { WhatsAppOrder, OrderStatus } from '../../types';
 import { 
   MessageCircle, 
