@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { AREQUIPA_DISTRICTS } from '../../data/initialData';
 import { ArequipaDistrict } from '../../types';
-import { Store, MapPin, Phone, Truck, Save, Smartphone, Crown } from 'lucide-react';
+import { Store, MapPin, Phone, Truck, Save, Smartphone, Crown, Share2, Copy, Check, QrCode, ExternalLink } from 'lucide-react';
 
 export const TenantSettings: React.FC = () => {
-  const { currentTenant, updateTenant } = useStore();
+  const { currentTenant, updateTenant, getTenantCatalogUrl, setIsShareModalOpen } = useStore();
 
   const [formData, setFormData] = useState({
     name: currentTenant.name,
@@ -22,6 +22,15 @@ export const TenantSettings: React.FC = () => {
   });
 
   const [saved, setSaved] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const catalogUrl = getTenantCatalogUrl();
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(catalogUrl);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +61,47 @@ export const TenantSettings: React.FC = () => {
           <span>Configuración del Comercio (Tenant SaaS)</span>
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          Ajustes de identidad, número de WhatsApp para pedidos contraentrega y zonas de reparto en Arequipa
+          Ajustes de identidad, número de WhatsApp para pedidos contraentrega y enlace de acceso para clientes
         </p>
+      </div>
+
+      {/* Customer Access Link Banner */}
+      <div className="bg-gradient-to-r from-blue-950 to-blue-900 text-white rounded-2xl p-5 border border-amber-500/40 shadow-sm space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400">
+              <Share2 className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">Link Oficial para Clientes</h3>
+              <p className="text-[11px] text-slate-300">Enlace directo para compartir en redes, estados de WhatsApp y volantes</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className="px-3.5 py-2 bg-amber-400 hover:bg-amber-500 text-blue-950 text-xs font-black rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+            >
+              {copiedLink ? <Check className="w-3.5 h-3.5 text-blue-950" /> : <Copy className="w-3.5 h-3.5 text-blue-950" />}
+              <span>{copiedLink ? '¡Link Copiado!' : 'Copiar Link'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsShareModalOpen(true)}
+              className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <QrCode className="w-3.5 h-3.5 text-amber-400" />
+              <span>Ver QR & Difusión</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="p-2.5 bg-black/25 rounded-xl font-mono text-xs text-amber-300 break-all border border-white/10 select-all">
+          {catalogUrl}
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 space-y-6 shadow-2xs text-xs">

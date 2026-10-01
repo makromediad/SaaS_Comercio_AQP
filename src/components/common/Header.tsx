@@ -13,7 +13,9 @@ import {
   ExternalLink,
   Store as StoreIcon,
   MapPin,
-  Crown
+  Crown,
+  LayoutDashboard,
+  Share2
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -29,7 +31,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
     setViewMode, 
     adminTab, 
     setAdminTab,
-    orders
+    orders,
+    setIsShareModalOpen
   } = useStore();
 
   const [tenantDropdownOpen, setTenantDropdownOpen] = useState(false);
@@ -55,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
         {/* Zone 1: Single text element wordmark */}
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => { setViewMode('admin'); setAdminTab('pos'); }}
+            onClick={() => { setViewMode('admin'); setAdminTab('dashboard'); }}
             className="text-left group cursor-pointer focus-visible:outline-none flex items-center gap-2"
           >
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950 flex items-center justify-center shadow-xs border border-amber-500/40">
@@ -136,6 +139,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
         {viewMode === 'admin' ? (
           <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
             <button
+              onClick={() => setAdminTab('dashboard')}
+              className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                adminTab === 'dashboard'
+                  ? 'bg-blue-950 text-white font-bold shadow-xs border border-amber-500/30'
+                  : 'text-slate-600 hover:text-blue-950 hover:bg-slate-100'
+              }`}
+            >
+              <LayoutDashboard className={`w-4 h-4 ${adminTab === 'dashboard' ? 'text-amber-400' : 'text-slate-500'}`} />
+              <span>Dashboard</span>
+            </button>
+
+            <button
               onClick={() => setAdminTab('pos')}
               className={`px-3 py-1.5 rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                 adminTab === 'pos'
@@ -208,8 +223,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
           </div>
         )}
 
-        {/* Zone 3: Primary action button */}
-        <div className="flex items-center gap-2.5">
+        {/* Zone 3: Primary action buttons */}
+        <div className="flex items-center gap-2">
+          {/* Share Catalog Link Button */}
+          <button
+            onClick={() => setIsShareModalOpen(true)}
+            className="px-3 py-2 text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-2xs hover:border-amber-400"
+            title="Compartir link del catálogo y código QR con clientes"
+          >
+            <Share2 className="w-3.5 h-3.5 text-amber-600" />
+            <span className="hidden sm:inline">Link Clientes</span>
+          </button>
+
           {viewMode === 'admin' ? (
             <button
               onClick={() => setViewMode('catalog')}
@@ -217,7 +242,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
               title="Abrir el catálogo digital público de esta tienda"
             >
               <ExternalLink className="w-3.5 h-3.5 text-amber-700" />
-              <span>Ver Catálogo Digital</span>
+              <span>Ver Catálogo</span>
             </button>
           ) : (
             <button
@@ -225,7 +250,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
               className="px-3.5 py-2 text-xs font-bold text-white bg-blue-950 hover:bg-blue-900 border border-amber-500/40 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.99]"
             >
               <Store className="w-3.5 h-3.5 text-amber-400" />
-              <span>Panel Comerciante (POS)</span>
+              <span>Panel Comerciante</span>
             </button>
           )}
         </div>
@@ -235,6 +260,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
       {/* Mobile navigation tab bar for admin */}
       {viewMode === 'admin' && (
         <div className="md:hidden border-t border-slate-200/80 px-4 py-2 flex items-center justify-between overflow-x-auto text-xs bg-slate-50/80">
+          <button
+            onClick={() => setAdminTab('dashboard')}
+            className={`px-2.5 py-1.5 rounded-md font-semibold whitespace-nowrap ${
+              adminTab === 'dashboard' ? 'bg-blue-950 text-white' : 'text-slate-600'
+            }`}
+          >
+            Dashboard
+          </button>
           <button
             onClick={() => setAdminTab('pos')}
             className={`px-2.5 py-1.5 rounded-md font-semibold whitespace-nowrap ${
@@ -283,4 +316,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewTenantModal }) => {
     </header>
   );
 };
+
+
 

@@ -14,10 +14,12 @@ import {
   X, 
   MessageCircle, 
   Smartphone, 
-  ChevronRight,
-  Crown,
-  Coins,
-  ShieldCheck
+  ChevronRight, 
+  Crown, 
+  Coins, 
+  Share2, 
+  Copy, 
+  QrCode 
 } from 'lucide-react';
 
 export const DigitalCatalog: React.FC = () => {
@@ -31,12 +33,16 @@ export const DigitalCatalog: React.FC = () => {
     clearCart, 
     cartTotal, 
     cartItemsCount,
-    createWhatsAppOrder
+    createWhatsAppOrder,
+    getTenantCatalogUrl,
+    setIsShareModalOpen,
+    showNotification
   } = useStore();
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('todos');
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [orderConfirmedData, setOrderConfirmedData] = useState<{
     orderNumber: string;
     waUrl: string;
@@ -87,7 +93,7 @@ export const DigitalCatalog: React.FC = () => {
     e.preventDefault();
     if (cart.length === 0) return;
     if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim()) {
-      alert('Por favor completa tu nombre, teléfono y dirección de entrega.');
+      showNotification('Por favor completa tu nombre, teléfono y dirección de entrega.', 'warning');
       return;
     }
 
@@ -164,7 +170,11 @@ export const DigitalCatalog: React.FC = () => {
     clearCart();
     setIsCartOpen(false);
 
-    window.open(waUrl, '_blank');
+    try {
+      window.open(waUrl, '_blank');
+    } catch {
+      // Ignored if browser prevents popup; confirmation modal has direct button
+    }
   };
 
   return (
@@ -206,10 +216,26 @@ export const DigitalCatalog: React.FC = () => {
                 <Coins className="w-3.5 h-3.5 text-amber-400" />
                 <span>Pagas al recibir (Efectivo / Yape / Plin)</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-blue-900/60 px-3 py-1.5 rounded-lg border border-amber-500/30">
-                <MessageCircle className="w-3.5 h-3.5 text-amber-400" />
-                <span>WhatsApp: +{currentTenant.whatsappNumber}</span>
-              </span>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(getTenantCatalogUrl());
+                  setLinkCopied(true);
+                  setTimeout(() => setLinkCopied(false), 2000);
+                }}
+                className="flex items-center gap-1.5 bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 px-3 py-1.5 rounded-lg border border-amber-400/50 cursor-pointer transition-colors shadow-2xs"
+                title="Copiar link de acceso para compartir con amigos"
+              >
+                {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-amber-400" />}
+                <span>{linkCopied ? '¡Link Copiado!' : 'Copiar Link Tienda'}</span>
+              </button>
+              <button
+                onClick={() => setIsShareModalOpen(true)}
+                className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg border border-white/20 cursor-pointer transition-colors"
+                title="Ver QR y compartir por WhatsApp"
+              >
+                <Share2 className="w-3.5 h-3.5 text-amber-400" />
+                <span>Compartir Catálogo</span>
+              </button>
             </div>
           </div>
         </div>
@@ -364,6 +390,45 @@ export const DigitalCatalog: React.FC = () => {
             })}
           </div>
         )}
+
+        {/* Customer Catalog Share & Footer Banner */}
+        <div className="mt-12 p-6 bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="space-y-1 text-center md:text-left">
+            <h4 className="text-sm font-bold text-blue-950 flex items-center justify-center md:justify-start gap-2">
+              <Crown className="w-4 h-4 text-amber-600" />
+              <span>{currentTenant.name} · Catálogo Oficial</span>
+            </h4>
+            <p className="text-xs text-slate-500">
+              {currentTenant.address}, {currentTenant.district} · WhatsApp: +{currentTenant.whatsappNumber}
+            </p>
+            <p className="text-[11px] text-amber-800 font-medium">
+              Link directo del catálogo: <span className="font-mono text-blue-950 font-bold select-all">{getTenantCatalogUrl()}</span>
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(getTenantCatalogUrl());
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+              }}
+              className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-blue-950 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-amber-600" />}
+              <span>{linkCopied ? '¡Link Copiado!' : 'Copiar Link'}</span>
+            </button>
+
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="px-3.5 py-2 bg-blue-950 hover:bg-blue-900 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+            >
+              <Share2 className="w-3.5 h-3.5 text-amber-400" />
+              <span>Ver QR & Difusión</span>
+            </button>
+          </div>
+        </div>
+
       </div>
 
       {/* Floating Bottom Cart Bar */}

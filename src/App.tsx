@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { StoreProvider, useStore } from './context/StoreContext';
 import { Header } from './components/common/Header';
+import { ExecutiveDashboard } from './components/dashboard/ExecutiveDashboard';
 import { PointOfSale } from './components/pos/PointOfSale';
 import { InventoryManager } from './components/inventory/InventoryManager';
 import { ReportsView } from './components/reports/ReportsView';
@@ -14,6 +15,7 @@ import { DigitalCatalog } from './components/catalog/DigitalCatalog';
 import { TenantSettings } from './components/tenant/TenantSettings';
 import { ReceiptModal } from './components/pos/ReceiptModal';
 import { NewTenantModal } from './components/tenant/NewTenantModal';
+import { ShareCatalogModal } from './components/catalog/ShareCatalogModal';
 import { CheckCircle2, AlertCircle, Info, Sparkles } from 'lucide-react';
 
 const MainApp: React.FC = () => {
@@ -40,6 +42,7 @@ const MainApp: React.FC = () => {
           <DigitalCatalog />
         ) : (
           <div>
+            {adminTab === 'dashboard' && <ExecutiveDashboard />}
             {adminTab === 'pos' && <PointOfSale />}
             {adminTab === 'inventory' && <InventoryManager />}
             {adminTab === 'reports' && <ReportsView />}
@@ -63,6 +66,9 @@ const MainApp: React.FC = () => {
         isOpen={isNewTenantModalOpen}
         onClose={() => setIsNewTenantModalOpen(false)}
       />
+
+      {/* Public Catalog Link & QR Share Modal */}
+      <ShareCatalogModal />
 
       {/* Notification Toast */}
       {notification && (

@@ -44,8 +44,13 @@ interface StoreContextType {
   // Navigation & View
   viewMode: 'admin' | 'catalog';
   setViewMode: (mode: 'admin' | 'catalog') => void;
-  adminTab: 'pos' | 'inventory' | 'reports' | 'orders' | 'settings';
-  setAdminTab: (tab: 'pos' | 'inventory' | 'reports' | 'orders' | 'settings') => void;
+  adminTab: 'dashboard' | 'pos' | 'inventory' | 'reports' | 'orders' | 'settings';
+  setAdminTab: (tab: 'dashboard' | 'pos' | 'inventory' | 'reports' | 'orders' | 'settings') => void;
+  isCustomerDirectAccess: boolean;
+  setIsCustomerDirectAccess: (isCustomer: boolean) => void;
+  getTenantCatalogUrl: (tenantSlug?: string) => string;
+  isShareModalOpen: boolean;
+  setIsShareModalOpen: (open: boolean) => void;
 
   // Receipt Modal
   lastSale: Sale | null;
@@ -77,7 +82,25 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   });
 
+  // Check URL parameters for customer catalog direct access (?tienda=slug or ?catalogo=slug)
+  const [isCustomerDirectAccess, setIsCustomerDirectAccess] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    return params.has('tienda') || params.has('catalogo') || params.has('store') || hash.includes('tienda=') || hash.includes('/catalogo/');
+  });
+
   const [activeTenantId, setActiveTenantId] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlStore = params.get('tienda') || params.get('catalogo') || params.get('store');
+      if (urlStore) {
+        const storedTenantsRaw = localStorage.getItem(STORAGE_KEYS.TENANTS);
+        const tenantList: Tenant[] = storedTenantsRaw ? JSON.parse(storedTenantsRaw) : INITIAL_TENANTS;
+        const matched = tenantList.find((t) => t.slug === urlStore || t.id === urlStore);
+        if (matched) return matched.id;
+      }
+    }
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.ACTIVE_TENANT_ID);
       return stored || 'tenant-characato';
@@ -140,11 +163,66 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [cart, setCart] = useState<CartItem[]>([]);
 
   // 6. Navigation View Mode
-  const [viewMode, setViewMode] = useState<'admin' | 'catalog'>('admin');
-  const [adminTab, setAdminTab] = useState<'pos' | 'inventory' | 'reports' | 'orders' | 'settings'>('pos');
+  const [viewMode, setViewMode] = useState<'admin' | 'catalog'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('tienda') || params.has('catalogo') || params.has('store')) {
+        return 'catalog';
+      }
+    }
+    return 'admin';
+  });
+  const [adminTab, setAdminTab] = useState<'dashboard' | 'pos' | 'inventory' | 'reports' | 'orders' | 'settings'>('dashboard');
   const [lastSale, setLastSale] = useState<Sale | null>(null);
 
-  // 7. Notification Toast
+  // 7. Share Catalog Modal State
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  // Generates absolute public URL for customer
+  const getTenantCatalogUrl = (tenantSlug?: string): string => {
+    const slug = tenantSlug || currentTenant.slug;
+    if (typeof window === 'undefined') return `?tienda=${slug}`;
+    const base = window.location.origin + window.location.pathname;
+    return `${base}?tienda=${slug}`;
+  };
+
+  // Sync browser URL parameter when viewMode or currentTenant changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const url = new URL(window.location.href);
+      if (viewMode === 'catalog') {
+        url.searchParams.set('tienda', currentTenant.slug);
+      } else {
+        url.searchParams.delete('tienda');
+        url.searchParams.delete('catalogo');
+        url.searchParams.delete('store');
+      }
+      window.history.replaceState({}, '', url.toString());
+    } catch {
+      // fallback
+    }
+  }, [viewMode, currentTenant.slug]);
+
+  // Listen for browser navigation changes or query parameter updates
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlStore = params.get('tienda') || params.get('catalogo') || params.get('store');
+      if (urlStore) {
+        const matched = tenants.find((t) => t.slug === urlStore || t.id === urlStore);
+        if (matched) {
+          setActiveTenantId(matched.id);
+          setViewMode('catalog');
+        }
+      }
+    };
+    window.addEventListener('popstate', handleUrlChange);
+    return () => window.removeEventListener('popstate', handleUrlChange);
+  }, [tenants]);
+
+  // 8. Notification Toast
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'info' | 'warning' } | null>(null);
 
   const showNotification = (message: string, type: 'success' | 'info' | 'warning' = 'success') => {
@@ -470,6 +548,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setViewMode,
         adminTab,
         setAdminTab,
+        isCustomerDirectAccess,
+        setIsCustomerDirectAccess,
+        getTenantCatalogUrl,
+        isShareModalOpen,
+        setIsShareModalOpen,
         lastSale,
         setLastSale,
         notification,
